@@ -1,0 +1,27 @@
+package class01;
+
+public class Code03_BSExist{
+
+	public static void selectionSort(int[] sortedArr,int num) {
+		if (sorteArr == null || sortedArr.length < 2) {
+			return false;
+		}
+    int L=0;
+    int R=sortedArr.length-1;
+    int mid=0;
+    while(L<R){
+    //mid=(L+R)/2
+    //L 10亿 R18亿
+    //mid=L+(R-L)/2
+    //N/2 N>>1相当于移位位运算更快
+    mid=L+((R-L)>>1);
+    if(sortedArr[mid]==num){
+    return true;
+    }else if(sortedArr[mid]>num){
+    R=mid-1;
+    }else{
+    L=mid+1;
+    }
+    }
+    return sortedArr[L]==num;
+    }

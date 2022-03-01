@@ -1,0 +1,16 @@
+ 
+public class Code07_EvenTimesOddTimes {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 2, 3, 1, 4};
+        printOddTimesNum1(arr);
+    }
+ 
+    // arr中，只有一种数，出现奇数次
+    public static void printOddTimesNum1(int[] arr) {
+        int eor = 0;
+        for (int i = 0; i < arr.length; i++) {
+            eor ^= arr[i];
+        }
+        System.out.println(eor);
+    }
+}

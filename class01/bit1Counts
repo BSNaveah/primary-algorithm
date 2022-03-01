@@ -1,0 +1,9 @@
+Public static int bit1counts(int N){
+  int count=0;
+  
+  while(N!=0){
+  int rightone=N&((~N)+1);
+  count++;
+  N^=rightOne
+  }
+}

@@ -1,0 +1,56 @@
+package day2;
+//反转链表
+public class Code01_ReverseList {
+	
+	public static class Node {
+		public int value;
+		public Node next;
+		public Node(int value,Node next) {
+			this.value = value;
+			this.next = next;
+		}
+	}
+	
+	public static class DoubleNode {
+		public int value;
+		public DoubleNode last;
+		public DoubleNode next;
+		
+		public DoubleNode(int data) {
+			value = data;
+		}
+	}
+	
+//	反转单链表
+	public static Node reverseLinkedList(Node head) {
+		/*
+		 *准备一个之前的变量
+		 *在准备一个后来的变量
+		 *
+		 */
+		Node pre = null;
+		Node next = null;
+		while(head != null) {
+			next = head.next;
+			head.next = pre;
+			pre = head;
+			head = next;	
+		}
+		return pre;
+	}
+	
+//	反转双向链表
+	public static DoubleNode reverseDoubleList(DoubleNode head) {
+		DoubleNode pre = null;
+		DoubleNode next = null;
+		while(head != null) {
+			next = head.next;
+			head.next = pre;
+			head.next = next;
+			pre = head;
+			head = next;
+		}
+		return pre;	
+	}
+	
+}

@@ -1,0 +1,163 @@
+package class03;
+
+public class Code01_MergeSort {
+
+
+
+	// 递归方法实现
+	public static void mergeSort1(int[] arr) {
+		if (arr == null || arr.length < 2) {
+			return;
+		}
+		// 传入被排序数组，以及左右边界
+		process(arr, 0, arr.length - 1);
+	}
+
+	// arr[L...R]范围上，变成有序的
+	// L...R    N    T(N) = 2*T(N/2) + O(N)  ->
+	public static void process(int[] arr, int L, int R) {
+		if (L == R) { // base case
+			return;
+		}
+		// >> 有符号右移1位，相当于除以2
+		int mid = L + ((R - L) >> 1);
+		process(arr, L, mid);
+		process(arr, mid + 1, R);
+		// 当前栈顶左右已经排好序，准备左右merge，注意这里的merge递归的每一层都会调用
+		merge(arr, L, mid, R);
+	}
+
+	public static void merge(int[] arr, int L, int M, int R) {
+	    // merge过程申请辅助数组，准备copy
+		int[] help = new int[R - L + 1];
+		// 用来标识help的下标
+		int i = 0;
+		// 左边有序数组的指针
+		int p1 = L;
+		// 右边有序数组的指针
+		int p2 = M + 1;
+		// p1和p2都没越界的情况下，谁小copy谁
+		while (p1 <= M && p2 <= R) {
+			help[i++] = arr[p1] <= arr[p2] ? arr[p1++] : arr[p2++];
+		}
+		// 要么p1越界了，要么p2越界了，谁没越界把谁剩下的元素copy到help中
+		while (p1 <= M) {
+			help[i++] = arr[p1++];
+		}
+		while (p2 <= R) {
+			help[i++] = arr[p2++];
+		}
+		// 把辅助数组中整体merge后的有序数组，copy回原数组中去
+		for (i = 0; i < help.length; i++) {
+			arr[L + i] = help[i];
+		}
+	}
+
+	// 非递归方法实现
+	public static void mergeSort2(int[] arr) {
+		if (arr == null || arr.length < 2) {
+			return;
+		}
+		int N = arr.length;
+		// 当前有序的，左组长度,那么实质分组大小是从2开始的
+		int mergeSize = 1; 
+		while (mergeSize < N) { // log N
+		    // L表示当前分组的左组的位置，初始为第一个分组的左组位置为0
+			int L = 0;
+			// 0.... 
+			while (L < N) {左组都凑不齐
+				// L...M  当前左组（mergeSize）
+				int M = L + mergeSize - 1;//知道size求中间
+				// 当前左组包含当前分组的所有元素，即没有右组了，无需merge已经有序
+				if (M >= N) {
+					break;
+				}
+				//  L...M为左组   M+1...R(mergeSize)为右组。右组够mergeSize个的时候，右坐标为M + mergeSize，右组不够的情况下右组边界坐标为整个数组右边界N - 1
+				int R = Math.min(M + mergeSize, N - 1);//右租凑不齐，谁小就是当前右组的R
+				// 把当前组进行merge
+				merge(arr, L, M, R);
+				// 下一个分组的左组起始位置
+				L = R + 1;
+			}
+			// 如果mergeSize乘2必定大于N，直接break。防止mergeSize溢出，有可能N很大，下面乘2有可能范围溢出（整形数大于21亿）
+			if (mergeSize > N / 2) {
+				break;
+			}
+			// 无符号左移，相当于乘以2
+			mergeSize <<= 1;
+		}
+	}
+
+	// for test
+	public static int[] generateRandomArray(int maxSize, int maxValue) {
+		int[] arr = new int[(int) ((maxSize + 1) * Math.random())];
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = (int) ((maxValue + 1) * Math.random()) - (int) (maxValue * Math.random());
+		}
+		return arr;
+	}
+
+	// for test
+	public static int[] copyArray(int[] arr) {
+		if (arr == null) {
+			return null;
+		}
+		int[] res = new int[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			res[i] = arr[i];
+		}
+		return res;
+	}
+
+	// for test
+	public static boolean isEqual(int[] arr1, int[] arr2) {
+		if ((arr1 == null && arr2 != null) || (arr1 != null && arr2 == null)) {
+			return false;
+		}
+		if (arr1 == null && arr2 == null) {
+			return true;
+		}
+		if (arr1.length != arr2.length) {
+			return false;
+		}
+		for (int i = 0; i < arr1.length; i++) {
+			if (arr1[i] != arr2[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// for test
+	public static void printArray(int[] arr) {
+		if (arr == null) {
+			return;
+		}
+		for (int i = 0; i < arr.length; i++) {
+			System.out.print(arr[i] + " ");
+		}
+		System.out.println();
+	}
+
+	// for test
+	public static void main(String[] args) {
+		int testTime = 500000;
+		int maxSize = 100;
+		int maxValue = 100;
+		boolean succeed = true;
+		for (int i = 0; i < testTime; i++) {
+			int[] arr1 = generateRandomArray(maxSize, maxValue);
+			int[] arr2 = copyArray(arr1);
+			mergeSort1(arr1);
+			mergeSort2(arr2);
+			if (!isEqual(arr1, arr2)) {
+				succeed = false;
+				printArray(arr1);
+				printArray(arr2);
+				break;
+			}
+		}
+		System.out.println(succeed ? "Nice!" : "Oops!");
+	}
+
+}

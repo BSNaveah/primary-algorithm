@@ -1,0 +1,142 @@
+package class07;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class Code06_TreeMaxWidth {
+
+	public static class Node {
+		public int value;
+		public Node left;
+		public Node right;
+
+		public Node(int data) {
+			this.value = data;
+		}
+	}
+
+        // 方法1使用map
+	public static int maxWidthUseMap(Node head) {
+		if (head == null) {
+			return 0;
+		}
+		Queue<Node> queue = new LinkedList<>();
+		queue.add(head);
+		// key（节点） 在 哪一层，value
+		HashMap<Node, Integer> levelMap = new HashMap<>();
+		// head在第一层
+		levelMap.put(head, 1);
+		// 当前你正在统计哪一层的宽度
+		int curLevel = 1; 
+		// 当前层curLevel层，宽度目前是多少
+		int curLevelNodes = 0; 
+		// 用来保存所有层的最大值，也就是最大宽度
+		int max = 0;
+		while (!queue.isEmpty()) {
+			Node cur = queue.poll();
+			int curNodeLevel = levelMap.get(cur);
+			// 当前节点的左孩子不为空，队列加入左孩子，层数在之前层上加1
+			if (cur.left != null) {
+				levelMap.put(cur.left, curNodeLevel + 1);
+				queue.add(cur.left);
+			}
+			// 当前节点的右孩子不为空，队列加入右孩子，层数也变为当前节点的层数加1
+			if (cur.right != null) {
+				levelMap.put(cur.right, curNodeLevel + 1);
+				queue.add(cur.right);
+			}
+			// 当前层等于正在统计的层数，不结算
+			if (curNodeLevel == curLevel) {
+				curLevelNodes++;
+			} else {
+			  // 新的一层，需要结算
+			  // 得到目前为止的最大宽度
+				max = Math.max(max, curLevelNodes);
+				curLevel++;
+				// 结算后，当前层节点数设置为1
+				curLevelNodes = 1;
+			}
+		}
+        //等出了新层再结算老层，需要在最外面加一层更新max
+		// 由于最后一层，没有新的一层去结算，所以这里单独结算最后一层
+		max = Math.max(max, curLevelNodes);
+		return max;
+	}
+
+        // 方法2不使用map
+	public static int maxWidthNoMap(Node head) {
+		if (head == null) {
+			return 0;
+		}
+		Queue<Node> queue = new LinkedList<>();
+		queue.add(head);
+		// 当前层，最右节点是谁，初始head的就是本身
+		Node curEnd = head; 
+		// 如果有下一层，下一层最右节点是谁
+		Node nextEnd = null; 
+		// 全局最大宽度
+		int max = 0;
+		// 当前层的节点数，弹出时统计
+		int curLevelNodes = 0; 
+		while (!queue.isEmpty()) {
+			Node cur = queue.poll();
+			// 左边不等于空，加入左
+			if (cur.left != null) {
+				queue.add(cur.left);
+				// 孩子的最右节点暂时为左节点
+				nextEnd = cur.left;
+			}
+			// 右边不等于空，加入右
+			if (cur.right != null) {
+				queue.add(cur.right);
+				// 如果有右节点，孩子层的最右要更新为右节点
+				nextEnd = cur.right;
+			}
+			// 由于最开始弹出当前节点，那么该层的节点数加一
+			curLevelNodes++;
+			// 当前节点是当前层最右的节点，进行结算
+			if (cur == curEnd) {
+			  // 当前层的节点和max进行比较，计算当前最大的max
+                //每一层老层结束就直接结算，不是等出了新层再结算老层，不需要在最外面加一层更新max
+				max = Math.max(max, curLevelNodes);
+				// 即将进入下一层，重置下一层节点为0个节点
+				curLevelNodes = 0;
+				// 当前层的最右，直接更新为找出来的下一层最右
+				curEnd = nextEnd;
+			}
+		}
+		return max;
+	}
+
+	// for test
+	public static Node generateRandomBST(int maxLevel, int maxValue) {
+		return generate(1, maxLevel, maxValue);
+	}
+
+	// for test
+	public static Node generate(int level, int maxLevel, int maxValue) {
+		if (level > maxLevel || Math.random() < 0.5) {
+			return null;
+		}
+		Node head = new Node((int) (Math.random() * maxValue));
+		head.left = generate(level + 1, maxLevel, maxValue);
+		head.right = generate(level + 1, maxLevel, maxValue);
+		return head;
+	}
+
+	public static void main(String[] args) {
+		int maxLevel = 10;
+		int maxValue = 100;
+		int testTimes = 1000000;
+		for (int i = 0; i < testTimes; i++) {
+			Node head = generateRandomBST(maxLevel, maxValue);
+			if (maxWidthUseMap(head) != maxWidthNoMap(head)) {
+				System.out.println("Oops!");
+			}
+		}
+		System.out.println("finish!");
+
+	}
+
+}

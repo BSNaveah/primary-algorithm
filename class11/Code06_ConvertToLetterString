@@ -1,0 +1,120 @@
+package class11;
+
+public class Code06_ConvertToLetterString {
+
+	public static int number(String str) {
+		if (str == null || str.length() == 0) {
+			return 0;
+		}
+		// i初始为0，表示0位置往后有多少中转化结果
+		return process(str.toCharArray(), 0);
+	}
+
+	// str[0...i-1]已经转化完了，固定了
+	// i之前的位置，如何转化已经做过决定了, 不用再关心
+	// i... 有多少种转化的结果
+	public static int process(char[] str, int i) {
+	        // i和字符串长度一样大，右侧没有字符了。找到1中转化是0~n-1位置的转化
+		if (i == str.length) { // base case
+			return 1;
+		}
+		// i之前的决策，让当前i位置单独面对一个0字符，那么之前决策错误，返回0
+		// 例如10先转化为A，2位置是0字符无法转化，当前决策无效
+		// 而10直接转化为J,直接到终止位置，返回一种转化J
+		if (str[i] == '0') {
+			return 0;
+		}
+		
+		// i位置如果是1或者2，有可能和下一个位置共同转化，因为字符数为0~26
+		// 反之3~9超过26不需要决策
+		
+		// str[i] 如果是1，总是有两个选择，因为最大为19，不超过26
+		if (str[i] == '1') {
+			int res = process(str, i + 1);
+			if (i + 1 < str.length) {
+				res += process(str, i + 2);
+			}
+			return res;
+		}
+		// str[i] 如果是2，那么有可能有两种选择，需要看是否朝贡国26
+		if (str[i] == '2') {
+			int res = process(str, i + 1);
+			if (i + 1 < str.length && (str[i + 1] >= '0' && str[i + 1] <= '6')) {
+				res += process(str, i + 2); // (i和i+1)作为单独的部分，后续有多少种方法
+			}
+			return res;
+		}
+		// str[i] 在3~9的位置，下个位置必须决策一种选择
+		return process(str, i + 1);
+	}
+	
+	public static int dpWays2(String s) {
+		if (s == null || s.length() == 0) {
+			return 0;
+		}
+		char[] str = s.toCharArray();
+		int N = str.length;
+		int[] dp = new int[N+1];
+		dp[N] = 1;
+		for(int i = N-1; i >= 0; i--) {
+			if (str[i] == '0') {
+				dp[i] = 0;
+                //continue语句的作用是跳过本次循环体中余下尚未执行的语句，立即进行下一次的循环条件判定，可以理解为仅结束本次循环。
+                //原来递归返回的地方得加上continue,不然还是会执行下面的语句。
+                continue;
+			}
+			if (str[i] == '1') {
+				dp[i] = dp[i + 1];
+				if (i + 1 < str.length) {
+					dp[i] += dp[i + 2];
+				}
+                continue;
+			}
+			if (str[i] == '2') {
+				dp[i] = dp[i + 1];
+				if (i + 1 < str.length && (str[i + 1] >= '0' && str[i + 1] <= '6')) {
+					dp[i] += dp[i + 2]; // (i和i+1)作为单独的部分，后续有多少种方法
+				}
+                continue;
+			}
+		}
+		return dp[0];
+	}
+	
+
+	public static int dpWays(String s) {
+		if (s == null || s.length() == 0) {
+			return 0;
+		}
+		char[] str = s.toCharArray();
+		int N = str.length;
+		int[] dp = new int[N + 1];
+		dp[N] = 1;
+		for (int i = N - 1; i >= 0; i--) {
+			if (str[i] == '0') {
+				dp[i] = 0;
+                
+			} else if (str[i] == '1') {
+				dp[i] = dp[i + 1];
+				if (i + 1 < N) {
+					dp[i] += dp[i + 2];
+				}
+			} else if (str[i] == '2') {
+				dp[i] = dp[i + 1]; 
+				if (i + 1 < str.length && (str[i + 1] >= '0' && str[i + 1] <= '6')) {
+					dp[i] += dp[i + 2];
+				}
+			} else {
+				dp[i] = dp[i + 1];
+			}
+		}
+		return dp[0];
+	}
+
+	public static void main(String[] args) {
+		System.out.println(number("11111"));
+		System.out.println(dpWays2("11111"));
+	}
+
+}
+
